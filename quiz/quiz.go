@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -22,6 +23,8 @@ func main() {
 	}
 	defer fp.Close()
 
+	qAndAs := make(map[string]int)
+
 	reader := csv.NewReader(fp)
 	reader.LazyQuotes = true
 	for {
@@ -31,7 +34,13 @@ func main() {
 		} else if err != nil {
 			panic(err)
 		}
-		fmt.Println(record)
+		answer, err := strconv.Atoi(record[1])
+		if err != nil {
+			panic(err)
+		}
+		qAndAs[record[0]] = answer
+	}
+	for i := 0; i < *numberOfQuestions; i++ {
 	}
 
 }
