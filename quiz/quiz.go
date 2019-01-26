@@ -9,14 +9,14 @@ import (
 )
 
 func main() {
-	filename := "problems.csv"
 	var numberOfQuestions = flag.Int("q", 3, "number of questions")
+	var filename = flag.String("f", "problems.csv", "question file")
 	flag.Parse()
 	fmt.Println(filename)
 	fmt.Println(*numberOfQuestions)
 
 	var fp *os.File
-	fp, err := os.Open(filename)
+	fp, err := os.Open(*filename)
 	if err != nil {
 		panic(err)
 	}
@@ -34,25 +34,4 @@ func main() {
 		fmt.Println(record)
 	}
 
-	//quizes := []string{
-	//	"1+1, 2",
-	//	"2+1, 3",
-	//}
-	//fmt.Printf("load file\n")
-	//
-	//csvString := strings.Join(quizes, "\n")
-	//
-	//r := csv.NewReader(strings.NewReader(csvString))
-	//for {
-	//	record, err := r.Read()
-	//	if err == io.EOF {
-	//		break
-	//	}
-	//	if err != nil {
-	//		fmt.Println("Read error: ", err)
-	//		break
-	//	}
-	//
-	//	fmt.Printf("%s = %s\n", record[0], record[1])
-	//}
 }
