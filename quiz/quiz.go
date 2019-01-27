@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type QAndA struct {
@@ -17,10 +18,10 @@ type QAndA struct {
 	Answer   int
 }
 
+var correct = 0
+
 func main() {
-	var numberOfQuestions = flag.Int("q", 3, "number of questions")
-	var filename = flag.String("f", "problems.csv", "question file")
-	flag.Parse()
+	numberOfQuestions, filename, timer := setup()
 
 	var fp *os.File
 	fp, err := os.Open(*filename)
@@ -32,12 +33,21 @@ func main() {
 	var qAndAs = make([]QAndA, 0)
 	qAndAs = createQAndAs(fp, qAndAs)
 
-	correct := performQAndA(numberOfQuestions, qAndAs)
+	go performQAndA(numberOfQuestions, qAndAs)
+
+	time.Sleep(time.Duration(*timer) * time.Second)
 	fmt.Printf("Your fucked result is %v / %v\n", correct, *numberOfQuestions)
 }
 
-func performQAndA(numberOfQuestions *int, qAndAs []QAndA) int {
-	correct := 0
+func setup() (*int, *string, *int) {
+	var numberOfQuestions = flag.Int("q", 100, "number of questions")
+	var filename = flag.String("f", "problems.csv", "question file")
+	var timer = flag.Int("t", 30, "timer")
+	flag.Parse()
+	return numberOfQuestions, filename, timer
+}
+
+func performQAndA(numberOfQuestions *int, qAndAs []QAndA) {
 	for i := 0; i < *numberOfQuestions; i++ {
 		stdInReader := bufio.NewReader(os.Stdin)
 		randomIndex := rand.Intn(len(qAndAs))
@@ -51,7 +61,6 @@ func performQAndA(numberOfQuestions *int, qAndAs []QAndA) int {
 			fmt.Println("fuck incorrect \n")
 		}
 	}
-	return correct
 }
 
 func createQAndAs(fp *os.File, qAndAs []QAndA) []QAndA {
