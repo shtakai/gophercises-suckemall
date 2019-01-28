@@ -12,7 +12,27 @@ import (
 // http.Handler will be called instead.
 func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
 	//	TODO: Implement this...
-	return nil
+	// 0) connect key - val on pathsToUrls
+	// 1) dig val by key
+	// 2-1) if key exists
+	//			redirect to val
+	// 2-2) if key doesn't exist
+	//			fallback
+	_ = pathsToUrls
+	mux := http.NewServeMux()
+	for _, key := range pathsToUrls {
+		redirectHandler := http.RedirectHandler(pathsToUrls[key], http.StatusTemporaryRedirect)
+		mux.Handle(key, redirectHandler)
+	}
+	mux.Handle("/*", fallback)
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		val := pathsToUrls[path]
+		if val != nil {
+
+		}
+	}
 }
 
 // YAMLHandler will parse the provided YAML and then return
