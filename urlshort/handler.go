@@ -11,26 +11,25 @@ import (
 // If the path is not provided in the map, then the fallback
 // http.Handler will be called instead.
 func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
-	//	TODO: Implement this...
 	// 0) connect key - val on pathsToUrls
 	// 1) dig val by key
 	// 2-1) if key exists
 	//			redirect to val
 	// 2-2) if key doesn't exist
 	//			fallback
-	_ = pathsToUrls
-	mux := http.NewServeMux()
-	for _, key := range pathsToUrls {
-		redirectHandler := http.RedirectHandler(pathsToUrls[key], http.StatusTemporaryRedirect)
-		mux.Handle(key, redirectHandler)
-	}
-	mux.Handle("/*", fallback)
 
+	// returning is http.HandlerFunc.
+	//  => just func(w http.ResponseWriter, r *http.Request)
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-		val := pathsToUrls[path]
-		if val != nil {
-
+		// fetching url and result(ok) by path
+		url, ok := pathsToUrls[path]
+		if ok {
+			// use http.Redirect (code: 307)
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		} else {
+			// use fallback's serveHttp
+			fallback.ServeHTTP(w, r)
 		}
 	}
 }
