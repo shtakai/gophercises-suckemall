@@ -57,18 +57,27 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	// if error is happening, return err
 	// after same => maphandler
 	//  return mapHandler
-
 	var pathUrls []pathUrl
-	err := yaml.Unmarshal(yml, &pathUrls)
+	err := parseYaml(yml, pathUrls)
 	if err != nil {
 		return nil, err
 	}
+	pathsToUrls := makeMap(pathUrls)
+
+	return MapHandler(pathsToUrls, fallback), nil
+}
+
+func makeMap(pathUrls []pathUrl) map[string]string {
 	var pathsToUrls = make(map[string]string)
 	for _, path := range pathUrls {
 		pathsToUrls[path.Path] = path.Url
 	}
+	return pathsToUrls
+}
 
-	return MapHandler(pathsToUrls, fallback), nil
+func parseYaml(yml []byte, pathUrls []pathUrl) error {
+	err := yaml.Unmarshal(yml, &pathUrls)
+	return err
 }
 
 type pathUrl struct {
