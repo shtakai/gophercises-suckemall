@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 // Parse json to map[string]Chapter
@@ -19,6 +18,7 @@ type Chapter struct {
 
 func main() {
 	jsonStory := `
+"intro":
   {
     "title": "this is title",
     "story": [
@@ -38,11 +38,10 @@ func main() {
   }
 `
 
-	var Story Chapter
+	var Story map[string]interface{}
 	_ = Story
 
-	decoder := json.NewDecoder(strings.NewReader(jsonStory))
-	err := decoder.Decode(&Story)
+	err := json.Unmarshal([]byte(jsonStory), &Story)
 	if err != nil {
 		fmt.Errorf("error %v", err)
 	}
