@@ -18,7 +18,7 @@ type Chapter struct {
 
 func main() {
 	jsonStory := `
-"intro":
+{"intro":
   {
     "title": "this is title",
     "story": [
@@ -36,9 +36,11 @@ func main() {
       }
     ]
   }
+}
+
 `
 
-	var Story map[string]interface{}
+	var Story map[string]Chapter
 	_ = Story
 
 	err := json.Unmarshal([]byte(jsonStory), &Story)
