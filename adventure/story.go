@@ -3,9 +3,9 @@ package adventure
 // Parse json to map[string]Chapter
 
 type Chapter struct {
-	Title   string   `json:"title"`
-	Story   []string `json:"story"`
-	Options []Option `json:"options"`
+	Title      string   `json:"title"`
+	Paragraphs []string `json:"story"`
+	Options    []Option `json:"options"`
 }
 
 type Option struct {
@@ -14,3 +14,5 @@ type Option struct {
 }
 
 type Story map[string]Chapter
+
+const Intro = "intro"
