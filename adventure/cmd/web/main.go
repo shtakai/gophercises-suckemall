@@ -3,13 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"strconv"
+	"log"
+	"net/http"
 
 	"github.com/shtakai/gophercises-suckemall/adventure"
+
+	"os"
+	"strconv"
 )
 
 func main() {
+	port := flag.Int("port", 3333, "the port number")
 	filename := flag.String("file", "gopher.json", "json w/story")
 	flag.Parse()
 
@@ -20,7 +24,11 @@ func main() {
 		panic(err)
 	}
 
-	game(story)
+	h := adventure.NewHandler(story)
+	fmt.Printf("Starting server on port %v\n", *port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", *port), h))
+	//_ = h
+	//game(story)
 }
 
 func displayFile(filename *string) (int, error) {
