@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -16,7 +15,10 @@ func main() {
 
 	f := openFile(filename)
 
-	story := parseStory(f)
+	story, err := adventure.JsonStory(f)
+	if err != nil {
+		panic(err)
+	}
 
 	game(story)
 }
@@ -31,15 +33,6 @@ func openFile(filename *string) *os.File {
 		panic(err)
 	}
 	return f
-}
-
-func parseStory(f *os.File) adventure.Story {
-	decoder := json.NewDecoder(f)
-	var story adventure.Story
-	if err := decoder.Decode(&story); err != nil {
-		panic(err)
-	}
-	return story
 }
 
 func game(story adventure.Story) {
