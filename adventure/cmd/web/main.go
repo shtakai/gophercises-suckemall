@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/shtakai/gophercises-suckemall/adventure"
-
 	"os"
 	"strconv"
+
+	"github.com/shtakai/gophercises-suckemall/adventure"
 )
 
 func main() {

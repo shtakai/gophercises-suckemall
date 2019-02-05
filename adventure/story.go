@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
+	"strings"
 )
 
 // Parse json to map[string]Chapter
@@ -58,17 +60,37 @@ func init() {
 	tpl = template.Must(template.New("").Parse(defaultHandlerTemplate))
 }
 
-type handler struct {
-	s Story
-}
+//type handler struct {
+//	s      Story
+//	t      *template.Template
+//	pathFn func(r *http.Request) string
+//}
 
 func NewHandler(s Story) http.Handler {
 	return handler{s}
 }
 
-func (h handler) ServeHttp(w http.ResponseWriter, r *http.Request) {
-	err := tpl.Execute(w, h.s["intro"])
-	if err != nil {
-		panic(err)
+type handler struct {
+	s Story
+}
+
+func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimSpace(r.URL.Path)
+	if path == "" || path == "/" {
+		path = "/intro"
 	}
+	// '/intro' => 'intro'
+	path = path[1:]
+
+	if chapter, ok := h.s[path]; ok {
+		err := tpl.Execute(w, chapter)
+		if err != nil {
+			log.Printf("%v\n", err)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
+
+		}
+		return
+	}
+	http.Error(w, "chapter not found", http.StatusNotFound)
+
 }
