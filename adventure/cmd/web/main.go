@@ -45,59 +45,63 @@ func parseStory(f *os.File) adventure.Story {
 func game(story adventure.Story) {
 	var chapter adventure.Chapter
 	chapter, ok := story[adventure.Intro]
-	var input string
 
 	if !ok {
 		panic("no intro")
 	}
 
 	for {
-		fmt.Println("")
-		fmt.Println("")
-		fmt.Println("")
-		fmt.Println("")
-		fmt.Printf("TITLE: %v\n", chapter.Title)
-		fmt.Println("==========")
-		for _, paragraph := range chapter.Paragraphs {
-			fmt.Printf("%v\n\n", paragraph)
-		}
-
-		if len(chapter.Options) == 0 {
-			fmt.Println("==========")
-			fmt.Println("==========")
-			fmt.Println("==========")
-			fmt.Println("FUCK OFFFF")
-			fmt.Println("==========")
-			fmt.Println("==========")
-			fmt.Println("==========")
-			os.Exit(0)
-		}
-		fmt.Println("==========")
-		fmt.Print("Options\n")
-
-		for i, option := range chapter.Options {
-			fmt.Printf("%d : %v\n\n", i, option.Text)
-		}
-
-		fmt.Println("==========")
-		fmt.Print("Input your fucked\n")
-		var arc string
-		for {
-			fmt.Scan(&input)
-			fmt.Printf("you selected %v\n", input)
-			number, err := strconv.Atoi(input)
-			if err != nil || number < 0 || number > len(chapter.Options)-1 {
-				fmt.Println("fuck")
-				continue
-			}
-
-			fmt.Println("ok")
-			arc = chapter.Options[number].Arc
-			break
-		}
-		fmt.Printf("arc: %v", arc)
-
-		chapter = story[arc]
+		chapter = renderChapter(chapter, story)
 	}
 
+}
+
+func renderChapter(chapter adventure.Chapter, story adventure.Story) adventure.Chapter {
+	var (
+		input, arc string
+	)
+	renderTitle(chapter)
+
+	for _, paragraph := range chapter.Paragraphs {
+		fmt.Printf("%v\n\n", paragraph)
+	}
+	ensureEnd(chapter)
+
+	renderOptions(chapter)
+
+	fmt.Print("Input your fucked\n")
+	for {
+		fmt.Scan(&input)
+		fmt.Printf("you selected %v\n", input)
+		number, err := strconv.Atoi(input)
+		if err != nil || number < 0 || number > len(chapter.Options)-1 {
+			fmt.Println("fuck")
+			continue
+		}
+
+		fmt.Println("ok")
+		arc = chapter.Options[number].Arc
+		break
+	}
+	fmt.Printf("arc: %v", arc)
+	chapter = story[arc]
+	return chapter
+}
+
+func renderOptions(chapter adventure.Chapter) {
+	fmt.Print("Options\n")
+	for i, option := range chapter.Options {
+		fmt.Printf("%d : %v\n\n", i, option.Text)
+	}
+}
+
+func ensureEnd(chapter adventure.Chapter) {
+	if len(chapter.Options) == 0 {
+		fmt.Println("FUCK OFFFF")
+		os.Exit(0)
+	}
+}
+
+func renderTitle(chapter adventure.Chapter) (int, error) {
+	return fmt.Printf("TITLE: %v\n", chapter.Title)
 }
