@@ -9,16 +9,6 @@ import (
 	"strings"
 )
 
-// Parse json to map[string]Chapter
-func JsonStory(r io.Reader) (Story, error) {
-	decoder := json.NewDecoder(r)
-	var story Story
-	if err := decoder.Decode(&story); err != nil {
-		return nil, err
-	}
-	return story, nil
-}
-
 type Chapter struct {
 	Title      string   `json:"title"`
 	Paragraphs []string `json:"story"`
@@ -98,8 +88,26 @@ var defaultHandlerTemplate = `
 
 var tpl *template.Template
 
+type HandlerOption func(h *handler)
+
+type handler struct {
+	s      Story
+	t      *template.Template
+	pathFn func(r *http.Request) string
+}
+
 func init() {
 	tpl = template.Must(template.New("").Parse(defaultHandlerTemplate))
+}
+
+// Parse json to map[string]Chapter
+func JsonStory(r io.Reader) (Story, error) {
+	decoder := json.NewDecoder(r)
+	var story Story
+	if err := decoder.Decode(&story); err != nil {
+		return nil, err
+	}
+	return story, nil
 }
 
 func NewHandler(s Story, opts ...HandlerOption) http.Handler {
@@ -109,8 +117,6 @@ func NewHandler(s Story, opts ...HandlerOption) http.Handler {
 	}
 	return h
 }
-
-type HandlerOption func(h *handler)
 
 func WithTemplate(t *template.Template) HandlerOption {
 	return func(h *handler) {
@@ -122,12 +128,6 @@ func WithPathFunc(fn func(r *http.Request) string) HandlerOption {
 	return func(h *handler) {
 		h.pathFn = fn
 	}
-}
-
-type handler struct {
-	s      Story
-	t      *template.Template
-	pathFn func(r *http.Request) string
 }
 
 func defaultPathFn(r *http.Request) string {
