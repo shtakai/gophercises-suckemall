@@ -23,8 +23,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	h := adventure.NewHandler(story, nil)
+	//tpl := template.Must(template.New("").Parse("test")
+	h := adventure.NewHandler(story)
 	fmt.Printf("Starting server on port %v\n", *port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", *port), h))
 }
