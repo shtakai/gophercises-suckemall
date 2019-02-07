@@ -102,12 +102,6 @@ func init() {
 	tpl = template.Must(template.New("").Parse(defaultHandlerTemplate))
 }
 
-//type handler struct {
-//	s      Story
-//	t      *template.Template
-//	pathFn func(r *http.Request) string
-//}
-
 func NewHandler(s Story) http.Handler {
 	return handler{s}
 }
