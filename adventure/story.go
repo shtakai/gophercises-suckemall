@@ -103,7 +103,7 @@ func init() {
 }
 
 func NewHandler(s Story, opts ...HandlerOption) http.Handler {
-	h := handler{s, tpl}
+	h := handler{s, tpl, defaultPathFn}
 	for _, opt := range opts {
 		opt(&h)
 	}
@@ -118,19 +118,29 @@ func WithTemplate(t *template.Template) HandlerOption {
 	}
 }
 
-type handler struct {
-	s Story
-	t *template.Template
+func WithPathFunc(fn func(r *http.Request) string) HandlerOption {
+	return func(h *handler) {
+		h.pathFn = fn
+	}
 }
 
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+type handler struct {
+	s      Story
+	t      *template.Template
+	pathFn func(r *http.Request) string
+}
+
+func defaultPathFn(r *http.Request) string {
 	path := strings.TrimSpace(r.URL.Path)
 	if path == "" || path == "/" {
 		path = "/intro"
 	}
 	// '/intro' => 'intro'
-	path = path[1:]
+	return path[1:]
+}
 
+func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := h.pathFn(r)
 	if chapter, ok := h.s[path]; ok {
 		err := h.t.Execute(w, chapter)
 		if err != nil {
