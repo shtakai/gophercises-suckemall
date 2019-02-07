@@ -24,11 +24,9 @@ func main() {
 		panic(err)
 	}
 
-	h := adventure.NewHandler(story)
+	h := adventure.NewHandler(story, nil)
 	fmt.Printf("Starting server on port %v\n", *port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", *port), h))
-	//_ = h
-	//game(story)
 }
 
 func displayFile(filename *string) (int, error) {
