@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
+
+	"github.com/shtakai/gophercises-suckemall/link"
 )
 
 /*
@@ -30,5 +30,9 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	io.Copy(os.Stdout, resp.Body)
+	links, _ := link.Parse(resp.Body)
+
+	for _, l := range links {
+		fmt.Println(l)
+	}
 }
